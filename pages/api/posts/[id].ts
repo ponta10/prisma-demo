@@ -15,6 +15,9 @@ export default async function handler(
         where: {
           id: Number(id),
         },
+        include: {
+          comments: true, // Include the comments related to this post
+        },
       });
 
       if (!post) {

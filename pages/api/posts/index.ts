@@ -28,8 +28,19 @@ export default async function handle(
 
   if (req.method === "GET") {
     try {
-      const posts = await prisma.posts.findMany();
-      return res.status(200).json(posts);
+      const posts = await prisma.posts.findMany({
+        include: {
+          comments: true,
+        },
+      });
+
+      // Map through the posts to append the comment count
+      const postsWithCommentCount = posts.map((post) => ({
+        ...post,
+        commentsCount: post.comments.length,
+      }));
+
+      return res.status(200).json(postsWithCommentCount);
     } catch (error) {
       return res.status(500).json({ error: "Unable to retrieve posts" });
     }
