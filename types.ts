@@ -3,6 +3,7 @@ import { Comments, Posts } from "@prisma/client";
 export interface FormData {
   title: string;
   body: string;
+  userId?: string;
 }
 
 export interface PostWithComments extends Posts {
@@ -11,6 +12,7 @@ export interface PostWithComments extends Posts {
 }
 
 export interface LoginFormData {
+  name?: string;
   email: string;
   password: string;
 }

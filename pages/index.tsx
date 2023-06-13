@@ -62,7 +62,7 @@ export default function Home() {
     resolver: zodResolver(postSchema),
   });
   const onSubmit = (data: FormData) => {
-    createPost(data);
+    createPost({...data, userId: user?.id});
     reset();
   };
 

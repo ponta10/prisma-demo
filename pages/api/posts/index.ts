@@ -9,7 +9,7 @@ export default async function handle(
   res: NextApiResponse
 ) {
   if (req.method === "POST") {
-    const { title, body } = req.body;
+    const { title, body, userId } = req.body;
 
     if (!title || !body) {
       return res.status(400).json({ error: "Title and body are required" });
@@ -19,7 +19,7 @@ export default async function handle(
       data: {
         title,
         body,
-        userId: 1,
+        userId,
         created_at: new Date(),
       },
     });
