@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from "@prisma/client";
+import { getToken } from "next-auth/jwt";
 
 const prisma = new PrismaClient();
 
@@ -10,7 +11,11 @@ export default async function handler(
   if (req.method !== "POST") {
     return res.status(405).end(); // Method not allowed
   }
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_JWT_SECRET });
 
+  if (!token) {
+    return res.status(401).json({ error: "Not authorized" });
+  }
   const { comment, postId } = req.body;
 
   if (!comment || !postId) {
@@ -22,6 +27,7 @@ export default async function handler(
       data: {
         cooment: comment,
         postId: postId,
+        userId: Number(token.sub)
       },
     });
 

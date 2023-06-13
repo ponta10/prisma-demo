@@ -1,6 +1,5 @@
 import { Inter } from "next/font/google";
 import usePosts from "@/hooks/usePosts";
-import { Posts, PrismaClient } from "@prisma/client";
 import {
   Box,
   Button,
@@ -62,7 +61,7 @@ export default function Home() {
     resolver: zodResolver(postSchema),
   });
   const onSubmit = (data: FormData) => {
-    createPost({...data, userId: user?.id});
+    createPost(data);
     reset();
   };
 

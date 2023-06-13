@@ -1,5 +1,7 @@
+import useCurrentUser from "@/hooks/useCurrentUser";
 import { PrismaClient } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { getToken } from "next-auth/jwt";
 
 const prisma = new PrismaClient();
 
@@ -8,8 +10,13 @@ export default async function handle(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_JWT_SECRET });
+
+  if (!token) {
+    return res.status(401).json({ error: "Not authorized" });
+  }
   if (req.method === "POST") {
-    const { title, body, userId } = req.body;
+    const { title, body } = req.body;
 
     if (!title || !body) {
       return res.status(400).json({ error: "Title and body are required" });
@@ -19,7 +26,7 @@ export default async function handle(
       data: {
         title,
         body,
-        userId,
+        userId: Number(token.sub),
         created_at: new Date(),
       },
     });
