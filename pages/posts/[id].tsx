@@ -14,6 +14,14 @@ const postSchema = z.object({
   body: z.string().nonempty({ message: "Body is required" }),
 });
 
+const commentSchema = z.object({
+  comment: z.string().nonempty({ message: "Comment is required" }),
+});
+
+interface Comment {
+  comment: string;
+}
+
 const Posts = () => {
   const router = useRouter();
   const { id } = router.query;
@@ -25,6 +33,7 @@ const Posts = () => {
     error,
     deletePost,
     updatePost,
+    createComment,
   } = usePost(id as string);
 
   const handleDelete = () => {
@@ -40,9 +49,24 @@ const Posts = () => {
   } = useForm<FormData>({
     resolver: zodResolver(postSchema),
   });
-  const onSubmit = (data: any) => {
+
+  const {
+    register: commentRegister,
+    handleSubmit: commentSubmit,
+    formState: { errors: commentErrors },
+    reset
+  } = useForm<Comment>({
+    resolver: zodResolver(commentSchema),
+  });
+
+  const onSubmit = (data: FormData) => {
     updatePost(data);
     router.push("/");
+  };
+
+  const onSubmitComment = (data: any) => {
+    createComment({...data, postId: Number(id)});
+    reset();
   };
 
   if (isLoading) {
@@ -53,6 +77,11 @@ const Posts = () => {
     <Box padding={4}>
       <Typography variant="h4">{post?.title}</Typography>
       <Typography component="body">{post?.body}</Typography>
+      {post?.comments.map((item) => (
+        <Typography sx={{ boxShadow: 2, my: 2, p: 2 }} key={item.id}>
+          {item.cooment}
+        </Typography>
+      ))}
       <DeleteIcon onClick={handleDelete} sx={{ cursor: "pointer" }} />
       <EditIcon
         onClick={() => {
@@ -61,6 +90,20 @@ const Posts = () => {
           setValue("body", post?.body as string);
         }}
       />
+      <Stack
+        component="form"
+        onSubmit={commentSubmit(onSubmitComment)}
+        spacing={2}
+        padding={2}
+      >
+        <TextField
+          label="タイトル"
+          {...commentRegister("comment")}
+          error={Boolean(commentErrors.comment)}
+          helperText={commentErrors.comment?.message as string}
+        />
+        <Button type="submit">送信</Button>
+      </Stack>
       {edit && (
         <Stack
           component="form"

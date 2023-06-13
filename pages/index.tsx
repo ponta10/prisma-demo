@@ -60,7 +60,7 @@ export default function Home() {
       </Stack>
       <Grid container spacing={4} padding={4}>
         {posts?.map((item) => (
-          <Grid item xs={4}>
+          <Grid item xs={4} key={item?.id}>
             <Card onClick={() => router.push(`/posts/${item?.id}`)}>
               <CardContent>
                 <Typography variant="h5" gutterBottom>

@@ -1,4 +1,4 @@
-import { Posts } from "@prisma/client";
+import { Comments, Posts } from "@prisma/client";
 
 export interface FormData {
   title: string;
@@ -7,4 +7,5 @@ export interface FormData {
 
 export interface PostWithComments extends Posts {
   commentsCount: number;
+  comments: Comments[];
 }

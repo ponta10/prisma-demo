@@ -1,16 +1,16 @@
 import useSWR, { mutate as globalMutate } from "swr";
 import axios from "axios";
-import { Posts } from "@prisma/client";
-import { FormData } from "@/types";
+import { FormData, PostWithComments } from "@/types";
 import fetcher from "@/lib/fetcher";
 
 interface PostProps {
-  data: Posts | undefined;
+  data: PostWithComments | undefined;
   isLoading: boolean;
   error: any;
   mutate: () => void;
   deletePost: () => Promise<void>;
   updatePost: (updatePost: FormData) => Promise<void>;
+  createComment: (newComment: any) => Promise<void>;
 }
 
 const usePost = (id?: string): PostProps => {
@@ -23,6 +23,15 @@ const usePost = (id?: string): PostProps => {
       revalidateOnReconnect: false,
     }
   );
+
+  const createComment = async (newComment: any) => {
+    try {
+      await axios.post("/api/comments", newComment);
+      globalMutate(`/api/posts/${id}`);
+    } catch (error) {
+      console.error("Error creating comment:", error);
+    }
+  };
 
   const performMutation = async (
     method: "delete" | "put",
@@ -52,6 +61,7 @@ const usePost = (id?: string): PostProps => {
     mutate,
     deletePost,
     updatePost,
+    createComment,
   };
 };
 

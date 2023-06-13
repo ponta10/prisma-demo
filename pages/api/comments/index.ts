@@ -20,7 +20,7 @@ export default async function handler(
   try {
     const newComment = await prisma.comments.create({
       data: {
-        cooment: comment, // <- この行を修正
+        cooment: comment,
         postId: postId,
       },
     });
@@ -30,6 +30,6 @@ export default async function handler(
     console.error(error);
     return res
       .status(500)
-      .json({ error: "An error occurred while creating the comment" });
+      .json({ error: error });
   }
 }
