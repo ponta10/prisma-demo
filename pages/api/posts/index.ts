@@ -32,6 +32,9 @@ export default async function handle(
         include: {
           comments: true,
         },
+        orderBy: {
+          id: 'asc',
+        },
       });
 
       // Map through the posts to append the comment count

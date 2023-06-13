@@ -3,13 +3,14 @@ import useSWR, { mutate as globalMutate } from 'swr'
 import fetcher from '@/lib/fetcher';
 import { Posts } from '@prisma/client';
 import axios from 'axios';
+import { FormData, PostWithComments } from '@/types';
 
 interface PostProps {
-    data: Posts[] | undefined;
+    data: PostWithComments[] | undefined;
     error: any;
     isLoading: boolean;
     mutate: () => void;
-    createPost: (newPost: any) => Promise<void>;
+    createPost: (newPost: FormData) => Promise<void>;
 }
 
 const usePosts = (): PostProps => {
@@ -19,7 +20,7 @@ const usePosts = (): PostProps => {
     revalidateOnReconnect: false,
   });
 
-  const createPost = async (newPost?: any) => {
+  const createPost = async (newPost: FormData) => {
     try {
       await axios.post('/api/posts', newPost);
       globalMutate('/api/posts');
