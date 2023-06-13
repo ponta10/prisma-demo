@@ -19,6 +19,7 @@ export default async function handle(
       data: {
         title,
         body,
+        userId: 1,
         created_at: new Date(),
       },
     });

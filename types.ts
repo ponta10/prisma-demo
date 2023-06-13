@@ -9,3 +9,8 @@ export interface PostWithComments extends Posts {
   commentsCount: number;
   comments: Comments[];
 }
+
+export interface LoginFormData {
+  email: string;
+  password: string;
+}

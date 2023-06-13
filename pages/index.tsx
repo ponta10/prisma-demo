@@ -1,6 +1,6 @@
 import { Inter } from "next/font/google";
 import usePosts from "@/hooks/usePosts";
-import { Posts } from "@prisma/client";
+import { Posts, PrismaClient } from "@prisma/client";
 import {
   Box,
   Button,
@@ -16,9 +16,33 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { FormData } from "@/types";
-import CommentIcon from '@mui/icons-material/Comment';
+import CommentIcon from "@mui/icons-material/Comment";
+import useCurrentUser from "@/hooks/useCurrentUser";
+import { signOut } from "next-auth/react";
+import { getToken } from "next-auth/jwt";
+import { NextPageContext } from "next";
 
 const inter = Inter({ subsets: ["latin"] });
+
+export async function getServerSideProps(context: NextPageContext) {
+  const token = await getToken({
+    req: context.req as any,
+    secret: process.env.NEXTAUTH_JWT_SECRET,
+  });
+
+  if (!token) {
+    return {
+      redirect: {
+        destination: "/auth",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {},
+  };
+}
 
 const postSchema = z.object({
   title: z.string().nonempty({ message: "Title is required" }),
@@ -26,6 +50,7 @@ const postSchema = z.object({
 });
 
 export default function Home() {
+  const { data: user } = useCurrentUser();
   const { data: posts, createPost } = usePosts();
   const router = useRouter();
   const {
@@ -43,6 +68,8 @@ export default function Home() {
 
   return (
     <Box padding={4}>
+      <Typography>{user?.name}</Typography>
+      <Button onClick={() => signOut()}>Sing Out</Button>
       <Stack component="form" onSubmit={handleSubmit(onSubmit)} spacing={2}>
         <TextField
           label="タイトル"
@@ -66,7 +93,9 @@ export default function Home() {
                 <Typography variant="h5" gutterBottom>
                   {item?.title}
                 </Typography>
-                <Typography variant="body2" gutterBottom>{item?.body}</Typography>
+                <Typography variant="body2" gutterBottom>
+                  {item?.body}
+                </Typography>
                 <CommentIcon />
                 <Typography component="span">{item?.commentsCount}</Typography>
               </CardContent>
